@@ -16,23 +16,14 @@
 
 <VBox xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="eu.mihosoft.vrl.ui.codevisualization.MainWindowController">
    <children>
-    <MenuBar prefHeight="25.0" prefWidth="1104.0001220703125">
-      <menus>
-        <Menu mnemonicParsing="false" text="File">
-          <items>
-            <MenuItem fx:id="menuLoadItem" mnemonicParsing="false" onAction="#onLoadAction" text="Open" />
-            <MenuItem fx:id="menuSaveItem" mnemonicParsing="false" onAction="#onSaveAction" text="Save" />
-            <MenuItem mnemonicParsing="false" onAction="#onSaveAsAction" text="Save As" /><MenuItem fx:id="menuRunItem" mnemonicParsing="false" onAction="#onRunCodeAction" text="Run" />
-            <MenuItem fx:id="menuCloseItem" mnemonicParsing="false" onAction="#onCloseAction" text="Close" />
-          </items>
-        </Menu>
-        <Menu mnemonicParsing="false" text="Help">
-          <items>
-            <MenuItem mnemonicParsing="false" text="About" />
-          </items>
-        </Menu>
-      </menus>
-    </MenuBar>
+      <ToolBar prefHeight="40.0" prefWidth="650.0">
+        <items>
+          <Button minWidth="100.0" fx:id="menuLoadItem" mnemonicParsing="false" onAction="#onLoadAction" text="Open" />
+          <Button minWidth="100.0" fx:id="menuSaveItem" mnemonicParsing="false" onAction="#onSaveAction" text="Save" />
+          <Button minWidth="100.0" mnemonicParsing="false" onAction="#onSaveAsAction" text="Save As" />
+          <Button minWidth="100.0" fx:id="menuCloseItem" mnemonicParsing="false" onAction="#onCloseAction" text="Close" />
+        </items>
+      </ToolBar>
       <ToolBar prefHeight="40.0" prefWidth="650.0">
         <items>
           <Button fx:id="layoutBtn" minWidth="100.0" mnemonicParsing="false" onAction="#onLayoutAction" text="Layout" />

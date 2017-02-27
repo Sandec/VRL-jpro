@@ -5,14 +5,39 @@
 // Note however, that you may define your own "run" and "debug" task if you
 // prefer. In this case NetBeans will not add these tasks but you may rely on
 // your own implementation.
-if (!hasProperty('mainClass')) {
-    ext.mainClass = 'eu.mihosoft.vrl.ui.codevisualization.Main'
-//    mainClassName = mainClass;
+
+buildscript {
+    repositories {
+        mavenLocal()
+        jcenter()
+        maven {
+            url "${System.properties['user.home']}/.m2/repository/"
+        }
+
+        maven {
+            url "http://sandec.bintray.com/repo"
+        }
+
+        maven {
+            url "http://mix-software.com:8081/nexus/content/repositories/jpro-snapshots"
+        }
+
+        maven {
+            url "http://mix-software.com:8081/nexus/content/repositories/jpro"
+        }
+    }
+    dependencies {
+        classpath "com.jprotechnologies.jpro:jpro-plugin-gradle:0.1.10-SNAPSHOT"
+        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
+    }
 }
 
+if (!hasProperty('mainClass')) {
+    ext.mainClass = 'eu.mihosoft.vrl.ui.codevisualization.Main'
+}
 
 dependencies { 
-    compile group: 'eu.mihosoft.vrl.workflow', name: 'vworkflows-fx', version: '0.2+', changing: true
+    compile group: 'eu.mihosoft.vrl.workflow', name: 'vworkflows-fx', version: '0.2.4.2', changing: true
     
     compile group: 'org.reactfx', name: 'reactfx', version: '1.+'
     compile group: 'org.fxmisc.richtext', name: 'richtextfx', version: '0.+'
@@ -26,6 +51,7 @@ dependencies {
 }
 
 
+/*
 jar {
 
     // dependencies except VRL
@@ -36,11 +62,31 @@ jar {
     from files(sourceSets.main.output.classesDir)
     
     manifest { attributes 'Main-Class': mainClass }
-}
+}*/
 
+/*
 task run(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     main = mainClass;
     jvmArgs = ['-Dprism.forceGPU=true', '-Dprism.verbose=true', '-Dprism.order=es2,d3d,sw']
 //    jvmArgs = ['-Dprism.forceGPU=true']
 }
+*/
+
+apply plugin: 'com.github.johnrengelman.shadow'
+//configurations.all { // workaround to make play work with firebase
+//    exclude group: 'org.slf4j', module: 'slf4j-api'
+//}
+
+apply plugin: 'com.jprotechnologies.jpro'
+jpro {
+    jproVersion = "0.1.10-SNAPSHOT"
+    openingPath = "/test/fullscreen/default"
+    if (project.hasProperty('JPRO_QUIZMAX_LICENSE_USERNAME')) {
+        username="$JPRO_QUIZMAX_LICENSE_USERNAME"
+        password="$JPRO_QUIZMAX_LICENSE_PASSWORD"
+        licensenumber="$JPRO_QUIZMAX_LICENSE_LICENSENUMBER"
+    }
+    useJProVM = true
+}
+mainClassName = ext.mainClass

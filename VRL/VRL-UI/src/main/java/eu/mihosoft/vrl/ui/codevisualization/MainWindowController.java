@@ -156,6 +156,7 @@ import org.codehaus.groovy.control.CompilerConfiguration;
 import org.codehaus.groovy.control.customizers.ASTTransformationCustomizer;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
+import com.jpro.WebAPI;
 
 /**
  * FXML Controller class
@@ -172,16 +173,16 @@ public class MainWindowController implements Initializable {
     private Pane view;
 
     @FXML
-    private MenuItem menuSaveItem;
+    private Button menuSaveItem;
 
     @FXML
-    private MenuItem menuLoadItem;
+    private Button menuLoadItem;
 
     @FXML
-    private MenuItem menuCloseItem;
+    private Button menuCloseItem;
 
     @FXML
-    private MenuItem menuRunItem;
+    private Button menuRunItem;
 
     private Pane rootPane;
     private VFlow flow;
@@ -352,11 +353,11 @@ public class MainWindowController implements Initializable {
             cmdModifier = KeyCodeCombination.CONTROL_DOWN;
         }
 
-        menuSaveItem.setAccelerator(new KeyCodeCombination(KeyCode.S, cmdModifier));
-        menuCloseItem.setAccelerator(new KeyCodeCombination(KeyCode.Q, cmdModifier));
-        menuLoadItem.setAccelerator(new KeyCodeCombination(KeyCode.L, cmdModifier));
-        menuRunItem.setAccelerator(new KeyCodeCombination(KeyCode.R, cmdModifier));
-        
+        //menuSaveItem.setAccelerator(new KeyCodeCombination(KeyCode.S, cmdModifier));
+        //menuCloseItem.setAccelerator(new KeyCodeCombination(KeyCode.Q, cmdModifier));
+        //menuLoadItem.setAccelerator(new KeyCodeCombination(KeyCode.L, cmdModifier));
+        //menuRunItem.setAccelerator(new KeyCodeCombination(KeyCode.R, cmdModifier));
+
         this.layoutFXMLLoader = new FXMLLoader(getClass()
                 .getResource("LayoutPane.fxml"));
         try {
@@ -367,6 +368,23 @@ public class MainWindowController implements Initializable {
         this.layoutPaneController = layoutFXMLLoader.getController();
         this.layoutPaneController.setFlow(this.flow.getModel());
         this.epm = editorParentMode.EDITOR;
+
+        if(WebAPI.isBrowser()) {
+            Platform.runLater(() -> {
+                WebAPI.FileUploader fileUploader = getWebAPI().makeFileUploadNode(menuLoadItem);
+                fileUploader.setSelectFileOnClick(true);
+                fileUploader.selectedFileProperty().addListener((observable, oldValue, newValue) -> fileUploader.uploadFile());
+
+                fileUploader.uploadedFileProperty().addListener((observable, oldValue, newValue) -> {
+                    //try {
+                    loadTextFile(newValue, true);
+                    //} catch (IOException e) {
+                    //    e.printStackTrace();
+                    //}
+
+                });
+            });
+        }
     }
 
     @FXML
@@ -377,6 +395,10 @@ public class MainWindowController implements Initializable {
         flow.getModel().getVisualizationRequest().set(
                 VisualizationRequest.KEY_NODE_NOT_REMOVABLE,
                 freezeBtn.isSelected());
+    }
+
+    public WebAPI getWebAPI() {
+        return WebAPI.getWebAPI(view.getScene());
     }
 
     @FXML
@@ -416,7 +438,7 @@ public class MainWindowController implements Initializable {
 
     private void saveDocument(boolean askForLocationIfAlreadyOpened) {
 
-        if (askForLocationIfAlreadyOpened || currentDocument == null) {
+        if (!WebAPI.isBrowser() && (askForLocationIfAlreadyOpened || currentDocument == null)) {
             FileChooser.ExtensionFilter mdFilter
                     = new FileChooser.ExtensionFilter(
                             "Text Files (*.groovy, *.java, *.txt)",
@@ -437,6 +459,9 @@ public class MainWindowController implements Initializable {
                 saveUIData();
             }
             fileWriter.write(editor.getText() + "\n" + uiData);
+            if(WebAPI.isBrowser()) {
+                getWebAPI().downloadURL(currentDocument.toURL());
+            }
         } catch (IOException ex) {
             Logger.getLogger(MainWindowController.class.getName()).
                     log(Level.SEVERE, null, ex);
@@ -581,6 +606,8 @@ public class MainWindowController implements Initializable {
 
         try {
             if (f == null) {
+                if(WebAPI.isBrowser()) return;
+
                 FileChooser.ExtensionFilter mdFilter
                         = new FileChooser.ExtensionFilter(
                                 "Text Files (*.groovy, *.java, *.txt)",
