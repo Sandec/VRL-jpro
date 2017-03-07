@@ -817,7 +817,7 @@ public class VariableFlowNodeSkin extends CustomFlowNodeSkin {
                 viewGroup.getChildren().addAll(mv);
 //            viewGroup.getChildren().add(new AmbientLight(ambient));
 
-                if (false /*!com.jpro.WebAPI.isBrowser()*/) {
+                if (!com.jpro.WebAPI.isBrowser()) {
                     outputs.getChildren().addAll(subScene);
                 } else {
                     viewGroup.translateZProperty().bind(
