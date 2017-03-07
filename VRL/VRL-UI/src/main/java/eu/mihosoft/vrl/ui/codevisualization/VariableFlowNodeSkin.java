@@ -72,12 +72,16 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.MeshView;
 import javafx.scene.text.TextAlignment;
+import javafx.scene.SnapshotParameters;
+import javafx.scene.image.Image;
+import javafx.application.Platform;
 import jfxtras.scene.control.window.Window;
 import jfxtras.scene.control.window.WindowUtil;
 import org.fxmisc.richtext.CodeArea;
 import org.reactfx.Change;
 import org.reactfx.EventStream;
 import org.reactfx.EventStreams;
+import javafx.application.ConditionalFeature;
 
 /**
  *
@@ -772,48 +776,65 @@ public class VariableFlowNodeSkin extends CustomFlowNodeSkin {
 
         CSG csg;
 
-        if (retVal instanceof CSG) {
-            csg = (CSG) retVal;
+        if (Platform.isSupported(ConditionalFeature.SCENE3D) && (retVal instanceof CSG)) {
+                csg = (CSG) retVal;
 
-            Group viewGroup = new Group();
+                Group viewGroup = new Group();
 
-            SubScene subScene = new SubScene(viewGroup, 300, 200, true,
-                    SceneAntialiasing.DISABLED);
+                SubScene subScene = new SubScene(viewGroup, 300, 200, true,
+                        SceneAntialiasing.DISABLED);
 //            subScene.setFill(Color.WHEAT);
-            PerspectiveCamera subSceneCamera = new PerspectiveCamera(false);
-            subScene.setCamera(subSceneCamera);
+                PerspectiveCamera subSceneCamera = new PerspectiveCamera(false);
+                subScene.setCamera(subSceneCamera);
 
-            MeshContainer mc = csg.toJavaFXMesh();
+                MeshContainer mc = csg.toJavaFXMesh();
 
-            MeshView mv = mc.getAsMeshViews().get(0);
+                MeshView mv = mc.getAsMeshViews().get(0);
 //            mv.setScaleX(10);
 //            mv.setScaleY(10);
 //            mv.setScaleZ(10);
 
 //Color diffuse = new Color(0.1, 0.99, 0.99, 0.5);
-            Color diffuse = new Color(0.99, 0.52, 0.0, 0.7);
-            Color spec = new Color(1.0, 1.0, 1.0, 1.0);
-            Color ambient = new Color(0.2, 0.15, 0.05, 1.0);
+                Color diffuse = new Color(0.99, 0.52, 0.0, 0.7);
+                Color spec = new Color(1.0, 1.0, 1.0, 1.0);
+                Color ambient = new Color(0.2, 0.15, 0.05, 1.0);
 
-            PhongMaterial mat = new PhongMaterial(diffuse);
+                PhongMaterial mat = new PhongMaterial(diffuse);
 
-            mat.setSpecularColor(spec);
+                mat.setSpecularColor(spec);
 
-            mv.setMaterial(mat);
+                mv.setMaterial(mat);
 
-            setMeshScale(mc, subScene.getBoundsInLocal(), mv);
+                setMeshScale(mc, subScene.getBoundsInLocal(), mv);
 
-            VFX3DUtil.addMouseBehavior(mv, subScene, MouseButton.PRIMARY);
+                VFX3DUtil.addMouseBehavior(mv, subScene, MouseButton.PRIMARY);
 
-            viewGroup.layoutXProperty().bind(
-                    subScene.widthProperty().divide(2));
-            viewGroup.layoutYProperty().bind(
-                    subScene.heightProperty().divide(2));
+                viewGroup.layoutXProperty().bind(
+                        subScene.widthProperty().divide(2));
+                viewGroup.layoutYProperty().bind(
+                        subScene.heightProperty().divide(2));
 
-            viewGroup.getChildren().addAll(mv);
+                viewGroup.getChildren().addAll(mv);
 //            viewGroup.getChildren().add(new AmbientLight(ambient));
 
-            outputs.getChildren().addAll(subScene);
+                if (false /*!com.jpro.WebAPI.isBrowser()*/) {
+                    outputs.getChildren().addAll(subScene);
+                } else {
+                    viewGroup.translateZProperty().bind(
+                            subScene.heightProperty().divide(2));
+                    Platform.runLater(() -> {
+                        SnapshotParameters params = new SnapshotParameters();
+                        params.setDepthBuffer(true);
+                        params.setFill(Color.TRANSPARENT);
+                        params.setCamera(subSceneCamera);
+                        Image image = viewGroup.snapshot(params, null);
+                        System.out.println("image: " + image.getWidth() + " - " + image.getHeight());
+
+                        outputs.getChildren().clear();
+                        outputs.getChildren().addAll(new ImageView(image));
+                        System.out.println("SNAPSHOTED Image!!!");
+                    });
+                }
         } else if (retVal instanceof BufferedImage) {
             WritableImage image = SwingFXUtils.toFXImage(
                     (BufferedImage) retVal, null);

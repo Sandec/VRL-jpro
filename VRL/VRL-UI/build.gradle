@@ -50,7 +50,6 @@ dependencies {
     compile files("lib/JCSG.jar");
 }
 
-
 /*
 jar {
 
@@ -78,15 +77,23 @@ apply plugin: 'com.github.johnrengelman.shadow'
 //    exclude group: 'org.slf4j', module: 'slf4j-api'
 //}
 
+//(new File("./bracelet.csg")).append("text".getBytes());
+/*
+public static void save(CSG csg) {
+    new File("./3D-Model.stl").append(csg.toStlString().getBytes("UTF-8"));
+}
+*/
+
 apply plugin: 'com.jprotechnologies.jpro'
 jpro {
     jproVersion = "0.1.10-SNAPSHOT"
     openingPath = "/test/fullscreen/default"
-    if (project.hasProperty('JPRO_QUIZMAX_LICENSE_USERNAME')) {
-        username="$JPRO_QUIZMAX_LICENSE_USERNAME"
-        password="$JPRO_QUIZMAX_LICENSE_PASSWORD"
-        licensenumber="$JPRO_QUIZMAX_LICENSE_LICENSENUMBER"
+    if (project.hasProperty('JPRO_LICENSE_USERNAME')) {
+        username="$JPRO_LICENSE_USERNAME"
+        password="$JPRO_LICENSE_PASSWORD"
+        licensenumber="$JPRO_LICENSE_LICENSENUMBER"
     }
     useJProVM = true
+    port = 8080
 }
 mainClassName = ext.mainClass

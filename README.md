@@ -13,6 +13,12 @@ Join the [Developer Group](https://groups.google.com/forum/#!forum/vrl-developer
 - Java >= 1.6 
 - NetBeans >= 7.4
 
+# Hot to run jpro
+
+```
+gradle vrl-ui:runBrowser
+```
+
 # How To Build
 
 - Open the *VRL* project with NetBeans and build it

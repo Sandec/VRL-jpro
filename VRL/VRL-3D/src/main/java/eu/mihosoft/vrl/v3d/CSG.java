@@ -265,6 +265,26 @@ public class CSG {
         return sb.toString();
     }
 
+
+    public void saveToFile(File file) {
+        FileWriter writer = null;
+        String text = toStlString();
+
+        try {
+            writer = new FileWriter(file, true);
+            InvokerHelper.write(writer, text);
+            writer.flush();
+            FileWriter temp = writer;
+            writer = null;
+            temp.close();
+        } finally {
+            closeWithWarning(writer);
+        }
+    }
+    public void save() {
+        saveToFile(new File("./3D-Model.stl"));
+    }
+
     /**
      * Returns this csg in STL string format.
      *

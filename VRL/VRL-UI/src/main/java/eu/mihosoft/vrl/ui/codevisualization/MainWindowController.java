@@ -424,6 +424,19 @@ public class MainWindowController implements Initializable {
     }
 
     @FXML
+    public void onDownloadCSG(ActionEvent e) {
+        try {
+            if(WebAPI.isBrowser()) {
+                URL url = new File("./3D-Model.stl").toURL();
+                getWebAPI().createPublicFile(url);
+                getWebAPI().downloadURL(url);
+            }
+        } catch (Exception ee) {
+            ee.printStackTrace();
+        }
+    }
+
+    @FXML
     public void onLoadAction(ActionEvent e) {
         loadTextFile(null, true);
     }
