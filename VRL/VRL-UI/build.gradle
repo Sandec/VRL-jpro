@@ -86,7 +86,7 @@ public static void save(CSG csg) {
 
 apply plugin: 'com.jprotechnologies.jpro'
 jpro {
-    jproVersion = "0.1.10-SNAPSHOT"
+    jproVersion = "0.1.12-SNAPSHOT"
     openingPath = "/test/fullscreen/default"
     if (project.hasProperty('JPRO_LICENSE_USERNAME')) {
         username="$JPRO_LICENSE_USERNAME"
